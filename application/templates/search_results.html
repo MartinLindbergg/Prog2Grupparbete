@@ -1,0 +1,23 @@
+<h2>Search Results</h2>
+
+{% if books_result %}
+  <h3>Books</h3>
+  <ul>
+    {% for book in books_result %}
+      <li>{{ book.title }} by {{ book.authors|join(', ') }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if authors_result %}
+  <h3>Authors</h3>
+  <ul>
+    {% for author in authors_result %}
+      <li>{{ author.name }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if not books_result and not authors_result %}
+  <p>No results found.</p>
+{% endif %}
