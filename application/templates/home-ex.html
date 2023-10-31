@@ -20,12 +20,13 @@
               <div class="col">
                 
               </div>
-              <div class="col mt-5 mb-5">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Search for author or book" aria-label="author search-bar" aria-describedby="button-addon2">
-                    <button class="btn btn-outline-dark border border-black" type="button" id="button-addon2">Search</button>
-                </div>
-              </div>
+        <div class="col mt-5 mb-5">
+        <form action="{{ url_for('search') }}" method="get">
+        <div class="input-group mb-3">
+        <input type="text" class="form-control" name="query" placeholder="Search for author or book name" aria-label="author search-bar" aria-describedby="button-addon2">
+        <button class="btn btn-outline-dark border border-black" type="submit" id="button-addon2">Search</button>
+        </div>
+              </form>
               <div class="col">
                 
               </div>
