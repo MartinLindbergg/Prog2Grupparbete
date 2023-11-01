@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello World</title>
+    <!-- Lägg till Bootstrap CDN-länk för att ladda Bootstrap-stilmallar -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body class="m-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Hello
+            {% if saved_name is not none %}
+                {{ saved_name }}
+            {% else %}
+                Stranger
+            {% endif %}
+        !</h2>
+        <form action="/save_name" method="POST" class="d-flex justify-content-center align-items-center">
+            <div class="form-group mr-2" style="margin-bottom: 0;">
+                <input type="text" class="form-control" style="width: 200px; height: 38px;" name="name" placeholder="Enter your name">
+            </div>
+            <button type="submit" class="btn btn-primary" style="height: 38px;">Save</button>
+        </form>
+    </div>
+    <div class="text-center"> <!-- Lägg till en ny text-center klassad div för att centrera knappen -->
+        <a href="/delete_cookie" class="btn btn-danger btn-sm m-3" style="width: 150px;">Delete my name</a>
+    </div>
+
+    <!-- Lägg till Bootstrap CDN-länk för att ladda Bootstrap JavaScript-plugins -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

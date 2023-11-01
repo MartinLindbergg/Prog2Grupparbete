@@ -1,14 +1,37 @@
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, make_response
 import requests
 import random
+import pandas as pd
 
 
 app = Flask(__name__)
 
 @app.route("/")
+def first_page():
+    saved_name = request.cookies.get("saved_name")
+    return render_template("first_page.html", saved_name=saved_name)
+
+@app.route("/save_name", methods=["POST"])
+def save_name():
+    name = request.form['name']
+
+    response = make_response(f"We will now remember your name, {name}!")
+    response.set_cookie("saved_name", name)
+    return response
+
+@app.route("/delete_cookie")
+def delete_cookie():
+    response = make_response("We will no longer remember your name!")
+    response.set_cookie("saved_name", "", expires=0)
+    return response
+
+
+
+@app.route("/home")
 def home():
     return render_template("home-ex.html")
-'''
+
+
 @app.route('/books')
 def index():
     return render_template('home-ex.html')
@@ -28,7 +51,7 @@ def book_details(book_id):
         return render_template('books-ex.html', book_data=book_data)
     else:
         return "Book not found."
-'''
+
 
 @app.route("/favorites")
 def favourites():
@@ -51,13 +74,24 @@ def random_book():
 
 # kommentera bort koden under för att få random att funka
 
+
 @app.route('/search')
 def search():
     query = request.args.get('query', '')
     books_result = search_books(query)
     authors_result = search_authors(query)
 
-    return render_template('search_results.html', books_result=books_result, authors_result=authors_result)
+    books_df = pd.DataFrame(books_result)
+    authors_df = pd.DataFrame(authors_result)
+
+    books_df = books_df.drop (['id', 'translators', 'bookshelves', 'copyright', 'media_type', 'formats', 'download_count'], axis=1)
+    authors_df = authors_df.drop (['id', 'translators', 'bookshelves', 'copyright', 'media_type', 'formats', 'download_count'], axis=1)
+
+    books_table = books_df.to_html(classes="table table-bordered table-hover", index=False, justify="left")
+    authors_table = authors_df.to_html(classes="table table-bordered table-hover", index=False, justify="left")
+
+    return render_template('search_results.html', books_table=books_table, authors_table=authors_table)
+
 
 def get_all_books():
     response = requests.get('https://gutendex.com/books')
@@ -67,7 +101,7 @@ def get_all_books():
     else:
         return []
 
-def get_book_data(book_id):
+def get_book_datas(book_id):
     response = requests.get(f"https://gutendex.com/books/{book_id}")
     if response.status_code == 200:
         book_info = response.json()
