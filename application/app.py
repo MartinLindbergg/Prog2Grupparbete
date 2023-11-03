@@ -53,18 +53,32 @@ def book_details(book_id):
         return "Book not found."
 
 
+
 @app.route('/favorites')
 def add_favorite():
+    """ Den hämtar 'saved_id' från användarens cookies
+    och använder sedan 'get_book_data' för att hämta bokdata baserat på 'saved_id' """
+# Kontrollera om 'saved_id' finns i cookies
     saved_id = request.cookies.get('saved_id')
     book_data = get_book_data(saved_id)
-    return render_template("books-ex.html", book_data=book_data)
+
+    if saved_id:
+        # Hantera när 'saved_id' finns
+        return render_template("books-ex.html", book_data=book_data)
+    else:
+        # Hantera när 'saved_id' inte finns
+        return render_template("books-ex.html", book_data=None) 
+        
 
 
 @app.route('/random', methods=["GET", "POST"])
 def random_book():
-    total_books = 71993  # någon som vet hur många böcker det finns det i vårt api?
+    total_books = 71993
     random_book_id = random.randint(1, total_books)
     book_data = get_book_data(random_book_id)
+    """ För POST-förfrågningar hämtas 'saved_id' från formuläret och sparar det som en cookie (Saved_id sparar
+    alltså användarens favorit bok (dess id)). Sedan returneras en HTML-sida med bokdata, 
+    och den slumpmässigt valda boken"""
     if request.method == "POST":
         global saved_id
         saved_id = request.form['saved_id']
@@ -82,17 +96,17 @@ def search():
     if request.method == 'POST':
      saved_id=request.form.get('saved_id')
      return redirect(url_for('search', query=request.form.get('query')))
-
+    
     #Hämtar sökfrågan från URL och söker efter författare och böcker från den givna sökningen
     query = request.args.get('query', '')
     books_result = search_books(query)
     authors_result = search_authors(query)
 
-    #Skapar dataframes från sökresultatet
+    #Skapar dataframes från sökresultatet  
     books_df = pd.DataFrame(books_result)
     authors_df = pd.DataFrame(authors_result)
 
-
+    
 
     #Tar bort kolumner som vi inte vill ha
     books_df = books_df.drop (['translators', 'bookshelves', 'copyright', 'media_type', 'formats', 'download_count'], axis=1)
@@ -104,14 +118,17 @@ def search():
 
     #gör om kolumner till stor bokstav(men då bli varje ords första bokstav stor)
     '''
-    books_table = re.sub(r'(?<=<td>)(.?)(?=</td>)',lambda x:x.group(0).title(), books_table)
-    authors_table = re.sub(r'(?<=<td>)(.?)(?=</td>)',lambda x:x.group(0).title(), authors_table)
+    books_table = re.sub(r'(?<=<td>)(.*?)(?=<\/td>)',lambda x:x.group(0).title(), books_table)
+    authors_table = re.sub(r'(?<=<td>)(.*?)(?=<\/td>)',lambda x:x.group(0).title(), authors_table)
     '''
     #gör om titlar till stor bokstav
-    books_table = re.sub(r'(?<=<th>)(.?)(?=</th>)', lambda x: x.group(0).title(), books_table)
-    authors_table = re.sub(r'(?<=<th>)(.?)(?=</th>)', lambda x: x.group(0).title(), authors_table)
+    books_table = re.sub(r'(?<=<th>)(.*?)(?=<\/th>)', lambda x: x.group(0).title(), books_table)
+    authors_table = re.sub(r'(?<=<th>)(.*?)(?=<\/th>)', lambda x: x.group(0).title(), authors_table)
 
     return render_template('search_results.html', books_table=books_table, authors_table=authors_table)
+
+
+
 def get_all_books():
     #Hämtar info om alla tillgänliga böcker från API
     response = requests.get('https://gutendex.com/books')
